@@ -1,11 +1,26 @@
+// popup.js
 const button = document.getElementById('toggleDns');
 const statusDiv = document.getElementById('status');
 
-async function getCurrentMode() {
-  const config = await chrome.dns.getDoHResolverConfig();
-  return config.mode === 'secure' ? 'doh' : 'default';
-}
+// DNS Mode Configuration (Default vs. DoH)
+const dnsConfig = {
+  modeDefault: {
+    mode: "default"
+  },
+  modeDoH: {
+    mode: "secure",
+    secureDnsMode: "secure",
+    secureDnsServers: ["https://dns.google/dns-query"] // Using Google DoH
+  }
+};
 
+// Load current DNS setting from storage
+chrome.storage.local.get(['dnsMode'], function(result) {
+  const dnsMode = result.dnsMode || 'default';
+  updateButton(dnsMode);
+});
+
+// Update button based on current mode
 function updateButton(mode) {
   if (mode === 'default') {
     button.textContent = 'Switch to DNS over HTTPS';
@@ -16,24 +31,27 @@ function updateButton(mode) {
   }
 }
 
-async function toggleDns() {
-  const currentMode = await getCurrentMode();
-  const newMode = currentMode === 'default' ? 'doh' : 'default';
-
-  if (newMode === 'doh') {
-    await chrome.dns.setDoHResolverConfig({
-      mode: 'secure',
-      templates: ['https://cloudflare-dns.com/dns-query']
+// Click event to toggle DNS setting
+button.addEventListener('click', () => {
+  chrome.storage.local.get(['dnsMode'], (result) => {
+    const currentMode = result.dnsMode || 'default';
+    const newMode = currentMode === 'default' ? 'doh' : 'default';
+    
+    // Set DNS setting
+    chrome.privacy.network.webRTCIPHandlingPolicy.set({ value: 'default_public_interface_only' }); // Enhanced privacy
+    chrome.privacy.network.dnsOverHttpsMode.set({
+      value: newMode === 'doh' ? 'secure' : 'off'
+    }, () => {
+      if (newMode === 'doh') {
+        chrome.privacy.network.dnsOverHttpsTemplates.set({
+          value: dnsConfig.modeDoH.secureDnsServers.join(' ')
+        });
+      } else {
+        chrome.privacy.network.dnsOverHttpsTemplates.clear({});
+      }
+      
+      chrome.storage.local.set({ dnsMode: newMode });
+      updateButton(newMode);
     });
-  } else {
-    await chrome.dns.setDoHResolverConfig({
-      mode: 'off'
-    });
-  }
-
-  chrome.storage.local.set({ dnsMode: newMode });
-  updateButton(newMode);
-}
-
-getCurrentMode().then(updateButton);
-button.addEventListener('click', toggleDns);
+  });
+});

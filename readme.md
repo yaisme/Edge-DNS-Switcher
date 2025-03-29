@@ -1,14 +1,15 @@
 # Hi there, I'm [Your Name] 👋
 
-## 🧩 Edge DNS Switcher
+## 🧩 Edge DNS Resolver (Prototype)
 
-A lightweight Microsoft Edge extension that allows users to quickly switch between Default DNS and DNS over HTTPS (DoH). Improve your browsing privacy and security effortlessly.
+This project was initially intended to be a Microsoft Edge extension that allows users to quickly switch between Default DNS and DNS over HTTPS (DoH). However, due to recent changes in the Chrome API, specifically the removal of `chrome.privacy.network.dnsOverHttpsMode` and `chrome.privacy.network.dnsOverHttpsTemplates`, the intended functionality is currently not achievable.
+
+This version serves as a prototype demonstrating DNS resolution using the `chrome.dns.resolve` API.
 
 ### 🚀 Features
 
-- Toggle easily between Default DNS and DNS over HTTPS (DoH).
-- Uses Google's DoH by default; customizable to other providers like Cloudflare.
-- Simple and intuitive user interface.
+- Demonstrates DNS resolution using `chrome.dns.resolve`.
+- Allows users to input a hostname and view its resolved DNS information.
 
 ### 📦 Installation
 
@@ -17,39 +18,27 @@ A lightweight Microsoft Edge extension that allows users to quickly switch betwe
 1. Clone this repository or download the ZIP file and extract it.
 2. Open Microsoft Edge and go to:
 
-   ```shell
-   edge://extensions
-   ```
+    ```shell
+    edge://extensions
+    ```
 
 3. Enable `Developer mode`.
 4. Click `Load unpacked` and select the extracted folder.
 
 ### 🛠 Usage
 
-- Click the extension icon in Edge.
-- Press the toggle button to switch DNS settings.
-- The current DNS mode is displayed clearly.
+1. Click the extension icon in Edge.
+2. Enter a hostname in the input field.
+3. Click the "Resolve DNS" button.
+4. The resolved DNS information will be displayed.
 
-### 🔧 Customization
+### ⚠️ Limitations
 
-To change the DoH provider, edit `popup.js`:
-
-```javascript
-const config = {
-    secureDnsServers: ["https://dns.google/dns-query"] // Replace with your preferred DoH URL
-}
-```
-
-Example providers:
-
-- Google: `https://dns.google/dns-query`
-- Cloudflare: `https://cloudflare-dns.com/dns-query`
-- Quad9: `https://dns.quad9.net/dns-query`
+Due to the removal of the `chrome.privacy.network.dnsOverHttpsMode` and `chrome.privacy.network.dnsOverHttpsTemplates` APIs, this extension cannot currently toggle the system's DNS over HTTPS settings. It only demonstrates DNS resolution using the `chrome.dns.resolve` API.
 
 ### 🔐 Permissions
 
-- `privacy`: Modify browser DNS settings.
-- `storage`: Save DNS mode preferences.
+- `dns`: Allows the extension to use the `chrome.dns.resolve` API.
 
 ### 🌐 Compatibility
 
@@ -61,6 +50,6 @@ Example providers:
 
 ---
 
-_This project is part of my open-source portfolio. Feel free to explore, use, and contribute!_
+_This project is a demonstration of the capabilities of the `chrome.dns.resolve` API. Contributions and suggestions for alternative approaches are welcome!_
 
 ⭐️ Star this repo if you found it useful!
